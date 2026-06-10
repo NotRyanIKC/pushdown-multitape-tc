@@ -1,0 +1,86 @@
+======================================================================
+RASTREAMENTO DE EXECUCAO — PDA (delimitadores balanceados)
+======================================================================
+
+----------------------------------------------------------------------
+CASO: "()"   (par simples)
+Esperado: ACEITA
+----------------------------------------------------------------------
+    (q0, entrada=()      , pilha=Z       ) ← configuração inicial
+    (q1, entrada=()      , pilha=Z       ) ε-move
+    (q1, entrada=)       , pilha=(Z      ) lê '('
+    (q1, entrada=ε       , pilha=Z       ) lê ')'
+    (q2, entrada=ε       , pilha=Z       ) ε-move → ACEITA
+   Resultado obtido: ACEITA  (entrada consumida em estado final com pilha = Z)   [OK]
+
+----------------------------------------------------------------------
+CASO: "([]{})"   (aninhamento dos tres tipos)
+Esperado: ACEITA
+----------------------------------------------------------------------
+    (q0, entrada=([]{})  , pilha=Z       ) ← configuração inicial
+    (q1, entrada=([]{})  , pilha=Z       ) ε-move
+    (q1, entrada=[]{})   , pilha=(Z      ) lê '('
+    (q1, entrada=]{})    , pilha=[(Z     ) lê '['
+    (q1, entrada={})     , pilha=(Z      ) lê ']'
+    (q1, entrada=})      , pilha={(Z     ) lê '{'
+    (q1, entrada=)       , pilha=(Z      ) lê '}'
+    (q1, entrada=ε       , pilha=Z       ) lê ')'
+    (q2, entrada=ε       , pilha=Z       ) ε-move → ACEITA
+   Resultado obtido: ACEITA  (entrada consumida em estado final com pilha = Z)   [OK]
+
+----------------------------------------------------------------------
+CASO: "{[()]}"   (aninhamento profundo)
+Esperado: ACEITA
+----------------------------------------------------------------------
+    (q0, entrada={[()]}  , pilha=Z       ) ← configuração inicial
+    (q1, entrada={[()]}  , pilha=Z       ) ε-move
+    (q1, entrada=[()]}   , pilha={Z      ) lê '{'
+    (q1, entrada=()]}    , pilha=[{Z     ) lê '['
+    (q1, entrada=)]}     , pilha=([{Z    ) lê '('
+    (q1, entrada=]}      , pilha=[{Z     ) lê ')'
+    (q1, entrada=}       , pilha={Z      ) lê ']'
+    (q1, entrada=ε       , pilha=Z       ) lê '}'
+    (q2, entrada=ε       , pilha=Z       ) ε-move → ACEITA
+   Resultado obtido: ACEITA  (entrada consumida em estado final com pilha = Z)   [OK]
+
+----------------------------------------------------------------------
+CASO: ""   (cadeia vazia (caso de fronteira))
+Esperado: ACEITA
+----------------------------------------------------------------------
+    (q0, entrada=ε       , pilha=Z       ) ← configuração inicial
+    (q1, entrada=ε       , pilha=Z       ) ε-move
+    (q2, entrada=ε       , pilha=Z       ) ε-move → ACEITA
+   Resultado obtido: ACEITA  (entrada consumida em estado final com pilha = Z)   [OK]
+
+----------------------------------------------------------------------
+CASO: "(]"   (fechamento de tipo errado)
+Esperado: REJEITA
+----------------------------------------------------------------------
+    (q0, entrada=(]      , pilha=Z       ) ← configuração inicial
+    (q1, entrada=(]      , pilha=Z       ) ε-move
+    (q1, entrada=]       , pilha=(Z      ) lê '('
+    (q1, entrada=]       , pilha=(Z      ) ⊘ trava — fechamento ']' não casa com o topo '('
+   Resultado obtido: REJEITA  (fechamento ']' não casa com o topo '(')   [OK]
+
+----------------------------------------------------------------------
+CASO: "([)]"   (cruzamento de delimitadores)
+Esperado: REJEITA
+----------------------------------------------------------------------
+    (q0, entrada=([)]    , pilha=Z       ) ← configuração inicial
+    (q1, entrada=([)]    , pilha=Z       ) ε-move
+    (q1, entrada=[)]     , pilha=(Z      ) lê '('
+    (q1, entrada=)]      , pilha=[(Z     ) lê '['
+    (q1, entrada=)]      , pilha=[(Z     ) ⊘ trava — fechamento ')' não casa com o topo '['
+   Resultado obtido: REJEITA  (fechamento ')' não casa com o topo '[')   [OK]
+
+----------------------------------------------------------------------
+CASO: "(()"   (delimitador aberto sem fechar)
+Esperado: REJEITA
+----------------------------------------------------------------------
+    (q0, entrada=(()     , pilha=Z       ) ← configuração inicial
+    (q1, entrada=(()     , pilha=Z       ) ε-move
+    (q1, entrada=()      , pilha=(Z      ) lê '('
+    (q1, entrada=)       , pilha=((Z     ) lê '('
+    (q1, entrada=ε       , pilha=(Z      ) lê ')'
+    (q1, entrada=ε       , pilha=(Z      ) ⊘ trava — fim da entrada com delimitadores ainda abertos na pilha
+   Resultado obtido: REJEITA  (fim da entrada com delimitadores ainda abertos na pilha)   [OK]
