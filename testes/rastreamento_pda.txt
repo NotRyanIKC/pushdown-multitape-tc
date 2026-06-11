@@ -1,86 +1,130 @@
-======================================================================
-RASTREAMENTO DE EXECUCAO — PDA (delimitadores balanceados)
-======================================================================
+========================================================================
+RASTREAMENTO DE EXECUCAO — PDA (validador de tags aninhadas <p> <h1> <h2>)
+========================================================================
 
-----------------------------------------------------------------------
-CASO: "()"   (par simples)
+------------------------------------------------------------------------
+CASO: "<p></p>"  (par simples)
 Esperado: ACEITA
-----------------------------------------------------------------------
-    (q0, entrada=()      , pilha=Z       ) ← configuração inicial
-    (q1, entrada=()      , pilha=Z       ) ε-move
-    (q1, entrada=)       , pilha=(Z      ) lê '('
-    (q1, entrada=ε       , pilha=Z       ) lê ')'
-    (q2, entrada=ε       , pilha=Z       ) ε-move → ACEITA
-   Resultado obtido: ACEITA  (entrada consumida em estado final com pilha = Z)   [OK]
+------------------------------------------------------------------------
+   (q_start  entrada=<p></p>        pilha=Z       ) ← configuração inicial
+   (q0       entrada=<p></p>        pilha=Z       ) ε-move
+   (q_lt     entrada=p></p>         pilha=Z       ) lê '<'
+   (q_ogt    entrada=></p>          pilha=PZ      ) lê 'p'
+   (q0       entrada=</p>           pilha=PZ      ) lê '>'
+   (q_lt     entrada=/p>            pilha=PZ      ) lê '<'
+   (q_c0     entrada=p>             pilha=PZ      ) lê '/'
+   (q_cgt    entrada=>              pilha=Z       ) lê 'p'
+   (q0       entrada=ε              pilha=Z       ) lê '>'
+   (q_accept entrada=ε              pilha=Z       ) ε-move → ACEITA
+  Resultado: ACEITA  (entrada consumida em estado final com pilha = Z)  [OK]
 
-----------------------------------------------------------------------
-CASO: "([]{})"   (aninhamento dos tres tipos)
+------------------------------------------------------------------------
+CASO: "<p><h1></h1></p>"  (aninhamento correto)
 Esperado: ACEITA
-----------------------------------------------------------------------
-    (q0, entrada=([]{})  , pilha=Z       ) ← configuração inicial
-    (q1, entrada=([]{})  , pilha=Z       ) ε-move
-    (q1, entrada=[]{})   , pilha=(Z      ) lê '('
-    (q1, entrada=]{})    , pilha=[(Z     ) lê '['
-    (q1, entrada={})     , pilha=(Z      ) lê ']'
-    (q1, entrada=})      , pilha={(Z     ) lê '{'
-    (q1, entrada=)       , pilha=(Z      ) lê '}'
-    (q1, entrada=ε       , pilha=Z       ) lê ')'
-    (q2, entrada=ε       , pilha=Z       ) ε-move → ACEITA
-   Resultado obtido: ACEITA  (entrada consumida em estado final com pilha = Z)   [OK]
+------------------------------------------------------------------------
+   (q_start  entrada=<p><h1></h1></p> pilha=Z       ) ← configuração inicial
+   (q0       entrada=<p><h1></h1></p> pilha=Z       ) ε-move
+   (q_lt     entrada=p><h1></h1></p> pilha=Z       ) lê '<'
+   (q_ogt    entrada=><h1></h1></p> pilha=PZ      ) lê 'p'
+   (q0       entrada=<h1></h1></p>  pilha=PZ      ) lê '>'
+   (q_lt     entrada=h1></h1></p>   pilha=PZ      ) lê '<'
+   (q_oh     entrada=1></h1></p>    pilha=PZ      ) lê 'h'
+   (q_ogt    entrada=></h1></p>     pilha=APZ     ) lê '1'
+   (q0       entrada=</h1></p>      pilha=APZ     ) lê '>'
+   (q_lt     entrada=/h1></p>       pilha=APZ     ) lê '<'
+   (q_c0     entrada=h1></p>        pilha=APZ     ) lê '/'
+   (q_ch     entrada=1></p>         pilha=APZ     ) lê 'h'
+   (q_cgt    entrada=></p>          pilha=PZ      ) lê '1'
+   (q0       entrada=</p>           pilha=PZ      ) lê '>'
+   (q_lt     entrada=/p>            pilha=PZ      ) lê '<'
+   (q_c0     entrada=p>             pilha=PZ      ) lê '/'
+   (q_cgt    entrada=>              pilha=Z       ) lê 'p'
+   (q0       entrada=ε              pilha=Z       ) lê '>'
+   (q_accept entrada=ε              pilha=Z       ) ε-move → ACEITA
+  Resultado: ACEITA  (entrada consumida em estado final com pilha = Z)  [OK]
 
-----------------------------------------------------------------------
-CASO: "{[()]}"   (aninhamento profundo)
+------------------------------------------------------------------------
+CASO: "<h1><p></p><p></p></h1>"  (varios irmaos aninhados)
 Esperado: ACEITA
-----------------------------------------------------------------------
-    (q0, entrada={[()]}  , pilha=Z       ) ← configuração inicial
-    (q1, entrada={[()]}  , pilha=Z       ) ε-move
-    (q1, entrada=[()]}   , pilha={Z      ) lê '{'
-    (q1, entrada=()]}    , pilha=[{Z     ) lê '['
-    (q1, entrada=)]}     , pilha=([{Z    ) lê '('
-    (q1, entrada=]}      , pilha=[{Z     ) lê ')'
-    (q1, entrada=}       , pilha={Z      ) lê ']'
-    (q1, entrada=ε       , pilha=Z       ) lê '}'
-    (q2, entrada=ε       , pilha=Z       ) ε-move → ACEITA
-   Resultado obtido: ACEITA  (entrada consumida em estado final com pilha = Z)   [OK]
+------------------------------------------------------------------------
+   (q_start  entrada=<h1><p></p><p></p></h1> pilha=Z       ) ← configuração inicial
+   (q0       entrada=<h1><p></p><p></p></h1> pilha=Z       ) ε-move
+   (q_lt     entrada=h1><p></p><p></p></h1> pilha=Z       ) lê '<'
+   (q_oh     entrada=1><p></p><p></p></h1> pilha=Z       ) lê 'h'
+   (q_ogt    entrada=><p></p><p></p></h1> pilha=AZ      ) lê '1'
+   (q0       entrada=<p></p><p></p></h1> pilha=AZ      ) lê '>'
+   (q_lt     entrada=p></p><p></p></h1> pilha=AZ      ) lê '<'
+   (q_ogt    entrada=></p><p></p></h1> pilha=PAZ     ) lê 'p'
+   (q0       entrada=</p><p></p></h1> pilha=PAZ     ) lê '>'
+   (q_lt     entrada=/p><p></p></h1> pilha=PAZ     ) lê '<'
+   (q_c0     entrada=p><p></p></h1> pilha=PAZ     ) lê '/'
+   (q_cgt    entrada=><p></p></h1>  pilha=AZ      ) lê 'p'
+   (q0       entrada=<p></p></h1>   pilha=AZ      ) lê '>'
+   (q_lt     entrada=p></p></h1>    pilha=AZ      ) lê '<'
+   (q_ogt    entrada=></p></h1>     pilha=PAZ     ) lê 'p'
+   (q0       entrada=</p></h1>      pilha=PAZ     ) lê '>'
+   (q_lt     entrada=/p></h1>       pilha=PAZ     ) lê '<'
+   (q_c0     entrada=p></h1>        pilha=PAZ     ) lê '/'
+   (q_cgt    entrada=></h1>         pilha=AZ      ) lê 'p'
+   (q0       entrada=</h1>          pilha=AZ      ) lê '>'
+   (q_lt     entrada=/h1>           pilha=AZ      ) lê '<'
+   (q_c0     entrada=h1>            pilha=AZ      ) lê '/'
+   (q_ch     entrada=1>             pilha=AZ      ) lê 'h'
+   (q_cgt    entrada=>              pilha=Z       ) lê '1'
+   (q0       entrada=ε              pilha=Z       ) lê '>'
+   (q_accept entrada=ε              pilha=Z       ) ε-move → ACEITA
+  Resultado: ACEITA  (entrada consumida em estado final com pilha = Z)  [OK]
 
-----------------------------------------------------------------------
-CASO: ""   (cadeia vazia (caso de fronteira))
+------------------------------------------------------------------------
+CASO: ""  (documento vazio (fronteira))
 Esperado: ACEITA
-----------------------------------------------------------------------
-    (q0, entrada=ε       , pilha=Z       ) ← configuração inicial
-    (q1, entrada=ε       , pilha=Z       ) ε-move
-    (q2, entrada=ε       , pilha=Z       ) ε-move → ACEITA
-   Resultado obtido: ACEITA  (entrada consumida em estado final com pilha = Z)   [OK]
+------------------------------------------------------------------------
+   (q_start  entrada=ε              pilha=Z       ) ← configuração inicial
+   (q0       entrada=ε              pilha=Z       ) ε-move
+   (q_accept entrada=ε              pilha=Z       ) ε-move → ACEITA
+  Resultado: ACEITA  (entrada consumida em estado final com pilha = Z)  [OK]
 
-----------------------------------------------------------------------
-CASO: "(]"   (fechamento de tipo errado)
+------------------------------------------------------------------------
+CASO: "<p></h1>"  (fecha tag errada)
 Esperado: REJEITA
-----------------------------------------------------------------------
-    (q0, entrada=(]      , pilha=Z       ) ← configuração inicial
-    (q1, entrada=(]      , pilha=Z       ) ε-move
-    (q1, entrada=]       , pilha=(Z      ) lê '('
-    (q1, entrada=]       , pilha=(Z      ) ⊘ trava — fechamento ']' não casa com o topo '('
-   Resultado obtido: REJEITA  (fechamento ']' não casa com o topo '(')   [OK]
+------------------------------------------------------------------------
+   (q_start  entrada=<p></h1>       pilha=Z       ) ← configuração inicial
+   (q0       entrada=<p></h1>       pilha=Z       ) ε-move
+   (q_lt     entrada=p></h1>        pilha=Z       ) lê '<'
+   (q_ogt    entrada=></h1>         pilha=PZ      ) lê 'p'
+   (q0       entrada=</h1>          pilha=PZ      ) lê '>'
+   (q_lt     entrada=/h1>           pilha=PZ      ) lê '<'
+   (q_c0     entrada=h1>            pilha=PZ      ) lê '/'
+   (q_ch     entrada=1>             pilha=PZ      ) lê 'h'
+   (q_ch     entrada=1>             pilha=PZ      ) ⊘ trava — tag de fechamento não casa com a tag aberta no topo ('P')
+  Resultado: REJEITA  (tag de fechamento não casa com a tag aberta no topo ('P'))  [OK]
 
-----------------------------------------------------------------------
-CASO: "([)]"   (cruzamento de delimitadores)
+------------------------------------------------------------------------
+CASO: "<p><h1></p></h1>"  (cruzamento de tags)
 Esperado: REJEITA
-----------------------------------------------------------------------
-    (q0, entrada=([)]    , pilha=Z       ) ← configuração inicial
-    (q1, entrada=([)]    , pilha=Z       ) ε-move
-    (q1, entrada=[)]     , pilha=(Z      ) lê '('
-    (q1, entrada=)]      , pilha=[(Z     ) lê '['
-    (q1, entrada=)]      , pilha=[(Z     ) ⊘ trava — fechamento ')' não casa com o topo '['
-   Resultado obtido: REJEITA  (fechamento ')' não casa com o topo '[')   [OK]
+------------------------------------------------------------------------
+   (q_start  entrada=<p><h1></p></h1> pilha=Z       ) ← configuração inicial
+   (q0       entrada=<p><h1></p></h1> pilha=Z       ) ε-move
+   (q_lt     entrada=p><h1></p></h1> pilha=Z       ) lê '<'
+   (q_ogt    entrada=><h1></p></h1> pilha=PZ      ) lê 'p'
+   (q0       entrada=<h1></p></h1>  pilha=PZ      ) lê '>'
+   (q_lt     entrada=h1></p></h1>   pilha=PZ      ) lê '<'
+   (q_oh     entrada=1></p></h1>    pilha=PZ      ) lê 'h'
+   (q_ogt    entrada=></p></h1>     pilha=APZ     ) lê '1'
+   (q0       entrada=</p></h1>      pilha=APZ     ) lê '>'
+   (q_lt     entrada=/p></h1>       pilha=APZ     ) lê '<'
+   (q_c0     entrada=p></h1>        pilha=APZ     ) lê '/'
+   (q_c0     entrada=p></h1>        pilha=APZ     ) ⊘ trava — tag de fechamento não casa com a tag aberta no topo ('A')
+  Resultado: REJEITA  (tag de fechamento não casa com a tag aberta no topo ('A'))  [OK]
 
-----------------------------------------------------------------------
-CASO: "(()"   (delimitador aberto sem fechar)
+------------------------------------------------------------------------
+CASO: "<p>"  (tag nao fechada)
 Esperado: REJEITA
-----------------------------------------------------------------------
-    (q0, entrada=(()     , pilha=Z       ) ← configuração inicial
-    (q1, entrada=(()     , pilha=Z       ) ε-move
-    (q1, entrada=()      , pilha=(Z      ) lê '('
-    (q1, entrada=)       , pilha=((Z     ) lê '('
-    (q1, entrada=ε       , pilha=(Z      ) lê ')'
-    (q1, entrada=ε       , pilha=(Z      ) ⊘ trava — fim da entrada com delimitadores ainda abertos na pilha
-   Resultado obtido: REJEITA  (fim da entrada com delimitadores ainda abertos na pilha)   [OK]
+------------------------------------------------------------------------
+   (q_start  entrada=<p>            pilha=Z       ) ← configuração inicial
+   (q0       entrada=<p>            pilha=Z       ) ε-move
+   (q_lt     entrada=p>             pilha=Z       ) lê '<'
+   (q_ogt    entrada=>              pilha=PZ      ) lê 'p'
+   (q0       entrada=ε              pilha=PZ      ) lê '>'
+   (q0       entrada=ε              pilha=PZ      ) ⊘ trava — fim da entrada com tags ainda abertas
+  Resultado: REJEITA  (fim da entrada com tags ainda abertas)  [OK]

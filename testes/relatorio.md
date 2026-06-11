@@ -1,33 +1,33 @@
 # Relatório de Rastreamento de Execução
 
-Tabelas-resumo dos testes. Os passos completos de execução estão em
-`rastreamento_pda.txt` e `rastreamento_mt_multifita.txt`.
+Tabelas-resumo dos testes. Os passos completos estão em `rastreamento_pda.txt`
+e `rastreamento_mt_multifita.txt`.
 
-## 1. PDA — Delimitadores balanceados `( ) [ ] { }`
+## 1. PDA — Validador de tags aninhadas `<p> <h1> <h2>`
 
-| # | Entrada | Esperado | Obtido | Motivo |
-|---|---------|----------|--------|--------|
-| 1 | `()` | ACEITA | ACEITA (OK) | entrada consumida em estado final com pilha = Z |
-| 2 | `([]{})` | ACEITA | ACEITA (OK) | entrada consumida em estado final com pilha = Z |
-| 3 | `{[()]}` | ACEITA | ACEITA (OK) | entrada consumida em estado final com pilha = Z |
-| 4 | "" | ACEITA | ACEITA (OK) | entrada consumida em estado final com pilha = Z |
-| 5 | `(]` | REJEITA | REJEITA (OK) | fechamento ']' não casa com o topo '(' |
-| 6 | `([)]` | REJEITA | REJEITA (OK) | fechamento ')' não casa com o topo '[' |
-| 7 | `(()` | REJEITA | REJEITA (OK) | fim da entrada com delimitadores ainda abertos na pilha |
-| 8 | `)(` | REJEITA | REJEITA (OK) | fechamento ')' não casa com o topo 'Z' |
+| # | Entrada | Esperado | Obtido | Observação |
+|---|---|---|---|---|
+| 1 | `<p></p>` | ACEITA | ACEITA | entrada consumida em estado final com pilha = Z |
+| 2 | `<p><h1></h1></p>` | ACEITA | ACEITA | entrada consumida em estado final com pilha = Z |
+| 3 | `<h1><p></p><p></p></h1>` | ACEITA | ACEITA | entrada consumida em estado final com pilha = Z |
+| 4 | "" | ACEITA | ACEITA | entrada consumida em estado final com pilha = Z |
+| 5 | `<p></h1>` | REJEITA | REJEITA | tag de fechamento não casa com a tag aberta no topo ('P') |
+| 6 | `<p><h1></p></h1>` | REJEITA | REJEITA | tag de fechamento não casa com a tag aberta no topo ('A') |
+| 7 | `<p>` | REJEITA | REJEITA | fim da entrada com tags ainda abertas |
+| 8 | `</p>` | REJEITA | REJEITA | tag de fechamento não casa com a tag aberta no topo ('Z') |
 
-## 2. MT Multifita — Soma binária (3 fitas)
+## 2. MT Multifita — Busca de padrão (2 fitas)
 
-| # | A | B | Esperado | Obtido | Decimal | Status |
-|---|---|---|----------|--------|---------|--------|
-| 1 | `1` | `1` | `10` | `10` | 1+1=2 | OK |
-| 2 | `101` | `11` | `1000` | `1000` | 5+3=8 | OK |
-| 3 | `110` | `101` | `1011` | `1011` | 6+5=11 | OK |
-| 4 | `0` | `0` | `0` | `0` | 0+0=0 | OK |
-| 5 | `1111` | `1` | `10000` | `10000` | 15+1=16 | OK |
-| 6 | `1010` | `1010` | `10100` | `10100` | 10+10=20 | OK |
+| # | Texto T | Padrão P | Esperado | Obtido | Python `P in T` |
+|---|---|---|---|---|---|
+| 1 | `aab` | `ab` | ACEITA | ACEITA | True |
+| 2 | `baaab` | `aaa` | ACEITA | ACEITA | True |
+| 3 | `aaa` | `ab` | REJEITA | REJEITA | False |
+| 4 | `ab` | `abb` | REJEITA | REJEITA | False |
+| 5 | `bbbb` | `a` | REJEITA | REJEITA | False |
+| 6 | `ab` | "" | ACEITA | ACEITA | True |
 
-## 3. Teste de estresse (verificação automática)
+## 3. Verificação automática (exaustiva)
 
-- MT soma binária: **5000/5000** somas aleatórias corretas (0–32767).
-- PDA delimitadores: **335923/335923** cadeias corretas (todas as cadeias de comprimento 0–7 sobre os 6 símbolos).
+- **PDA:** correto em **55987/55987** cadeias (todas as combinações de 0 a 6 tags do vocabulário).
+- **MT busca de padrão:** correto em **7905/7905** casos (texto de 0–7 e padrão de 0–4 símbolos sobre {a,b}).
