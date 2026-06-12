@@ -1,7 +1,5 @@
 # Declaração de Uso de Inteligência Artificial
 
-Conforme a Seção 8 da atividade.
-
 ## Ferramenta e data
 
 - **Ferramenta:** Claude (Anthropic).
@@ -17,6 +15,7 @@ A IA foi usada como **apoio**, nas seguintes etapas:
   (estados, alfabetos, função de transição) separada da rotina de simulação.
 - Geração dos rastreamentos de execução e dos testes de verificação automática.
 - Organização do repositório e redação inicial do README.
+- Geração do deck de slides da apresentação.
 
 ## Resumo dos prompts utilizados
 
@@ -27,6 +26,7 @@ A IA foi usada como **apoio**, nas seguintes etapas:
   busca de padrão, com definição formal e rastreamento passo a passo."
 - "Gere casos de teste (aceitos, rejeitados e de fronteira) e verifique a
   corretude automaticamente."
+- "Monte o deck de slides do seminário (tema escuro) refletindo os dois modelos."
 
 
 ## O que a equipe modificou, corrigiu ou rejeitou
@@ -40,6 +40,7 @@ A IA foi usada como **apoio**, nas seguintes etapas:
   finito). O PDA final tem **9 estados** e a MT tem **9 estados**.
 - Para o JFLAP, expandimos a tabela da MT para **31 transições concretas**, já
   que o JFLAP não admite curingas nas leituras.
+- Corrigimos algumas inconsistências no slide como nomes e datas erradas e citações inválidas
 
 
 ## Declaração final

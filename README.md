@@ -6,7 +6,7 @@ rastreamento de execução e testes.
 
 ## Identificação
 
-- **Disciplina:** Teoria da Computabilidade — Prof. Daniel Leal Souza (01/2026)
+- **Disciplina:** Teoria da Computabilidade — Prof. Daniel Leal Souza
 - **Turma:** CC5NA
 - **Integrantes:**
   - Felipe de Freitas
@@ -36,7 +36,7 @@ testes/
   rastreamento_pda.txt                 # passos de execução do PDA
   rastreamento_mt_multifita.txt        # passos de execução da MT
   relatorio.md                         # tabelas-resumo + verificação automática
-slides/                                # slides da apresentação
+slides/MT e PDA.pptx                   # slides da apresentação (15 slides)
 uso_ia.md                              # declaração de uso de IA
 README.md
 ```
