@@ -24,57 +24,79 @@ rastreamento de execução e testes.
 Os dois problemas são distintos (um valida estrutura aninhada, o outro busca
 uma subcadeia) e nenhum reutiliza exemplos vistos em aula.
 
-## Estrutura do repositório
+---
 
-```
-implementacoes/
-  automato_pilha/automato_pilha.py     # PDA: definição formal + simulador (Python)
-  automato_pilha/automato_pilha.jff    # PDA no formato JFLAP
-  mt_multifita/mt_multifita.py         # MT (2 fitas): definição formal + simulador (Python)
-  mt_multifita/mt_multifita.jff        # MT no formato JFLAP
-testes/
-  rastreamento_pda.txt                 # passos de execução do PDA
-  rastreamento_mt_multifita.txt        # passos de execução da MT
-  relatorio.md                         # tabelas-resumo + verificação automática
-slides/MT e PDA.pptx                   # slides da apresentação (15 slides)
-uso_ia.md                              # declaração de uso de IA
-README.md
-```
+## Autômato de Pilha (PDA)
 
-## Como executar (Python)
+### Definição formal
 
-Requer apenas **Python 3** (sem dependências externas).
+`M = (Q, Σ, Γ, δ, q0, Z0, F)` — **9 estados**
+
+- `Q = {q_start, q0, q_lt, q_oh, q_ogt, q_c0, q_ch, q_cgt, q_accept}`, `F = {q_accept}`
+- `Σ = { <, >, /, p, h, 1, 2 }`
+- `Γ = { Z, P, A, B }` (P = `<p>`, A = `<h1>`, B = `<h2>`), fundo `Z0 = Z`
+
+Ao abrir uma tag, empilha o símbolo correspondente; ao fechar, só desempilha
+se o topo for a tag certa — é assim que o aninhamento é verificado. Aceitação
+por estado final com a pilha de volta ao fundo `Z`. É uma linguagem Livre de
+Contexto: um autômato finito não controlaria a profundidade do aninhamento.
+
+### Como executar (Python)
 
 ```bash
-# Autômato de Pilha — validador de tags
 cd implementacoes/automato_pilha
-python3 automato_pilha.py                      # roda a bateria de exemplos
-python3 automato_pilha.py "<p><h1></h1></p>"   # testa uma cadeia, com trace passo a passo
-
-# MT Multifita — busca de padrão
-cd implementacoes/mt_multifita
-python3 mt_multifita.py            # roda a bateria de exemplos
-python3 mt_multifita.py aab ab     # busca o padrão "ab" no texto "aab", com trace
+python3 automato_pilha.py                      # bateria de exemplos
+python3 automato_pilha.py "<p><h1></h1></p>"   # cadeia específica com trace
 ```
 
-## Como abrir no JFLAP (arquivos .jff)
+### Como executar (JFLAP)
 
-Testado no **JFLAP 7.x**.
+Arquivo: `implementacoes/automato_pilha/automato_pilha.jff` (9 estados)
 
-**PDA — `implementacoes/automato_pilha/automato_pilha.jff`** (9 estados)
 Abra com **File ▸ Open**. A pilha já inicia com o símbolo de fundo `Z`. O nome
 de cada tag é lido caractere a caractere (por isso são necessários >8 estados),
 e a pilha guarda quais tags estão abertas para casar os fechamentos. Aceitação
-por **estado final**. Teste em **Input ▸ Step by State** com, por exemplo,
-`<p></p>`, `<p><h1></h1></p>` (aceitas) e `<p></h1>`, `<p><h1></p></h1>` (rejeitadas).
+por **estado final**.
 
-**MT Multifita — `implementacoes/mt_multifita/mt_multifita.jff`** (2 fitas, 9 estados)
+**Exemplos para testar:**
+- ✅ Aceitas: `<p></p>`, `<p><h1></h1></p>`
+- ❌ Rejeitadas: `<p></h1>`, `<p><h1></p></h1>`
+
+---
+
+## Máquina de Turing com Múltiplas Fitas (2 fitas)
+
+### Definição formal
+
+`M = (Q, Σ, Γ, δ, q0, B, F)` — **k = 2 fitas, 9 estados**
+
+- Fita 1: texto T; Fita 2: padrão P.
+- A máquina lê cada símbolo do padrão para o controle finito (`q_have_a`/`q_have_b`)
+  e compara com o texto. Ao falhar, rebobina as duas cabeças em sincronia
+  (`q_reset` → `q_shift1` → `q_shift2`) e avança a âncora do texto em uma posição.
+- Equivalente em poder à MT de fita única; as duas fitas tornam a comparação natural.
+
+### Como executar (Python)
+
+```bash
+cd implementacoes/mt_multifita
+python3 mt_multifita.py            # bateria de exemplos
+python3 mt_multifita.py aab ab     # busca "ab" em "aab" com trace
+```
+
+### Como executar (JFLAP)
+
+Arquivo: `implementacoes/mt_multifita/mt_multifita.jff` (2 fitas, 9 estados)
+
 Abra como **Multi-Tape Turing Machine**. Coloque o texto na **Fita 1** e o
 padrão na **Fita 2** (alfabeto {a, b}); a máquina para em `q_accept` se o padrão
-ocorre no texto e em `q_reject` caso contrário. Exemplos: T=`aab`, P=`ab`
-(aceita); T=`aaa`, P=`ab` (rejeita).
+ocorre no texto e em `q_reject` caso contrário.
 
-> Observação: o JFLAP não admite curingas nas leituras (cada fita exige um
+**Exemplos para testar:**
+- ✅ Aceita: T = `aab`, P = `ab`
+- ❌ Rejeita: T = `aaa`, P = `ab`
+
+> **Observação:** o JFLAP não admite curingas nas leituras (cada fita exige um
 > símbolo concreto por transição). Por isso a tabela da MT foi expandida para
 > **31 transições concretas**, extraídas de execuções já validadas do simulador
 > em Python. Caso sua versão do JFLAP apresente incompatibilidade ao abrir o
@@ -87,45 +109,58 @@ ocorre no texto e em `q_reject` caso contrário. Exemplos: T=`aab`, P=`ab`
 > reposicionar no início do padrão, o que passa **para a esquerda da posição
 > inicial**. O JFLAP modela a fita como **semi-infinita (limitada à esquerda)**,
 > então bloqueia esse movimento e rejeita justamente os casos que exigem
-> retrocesso (ex.: T=`aab`, P=`ab`). Os casos diretos, sem retrocesso (ex.:
-> T=`ab`, P=`ab`; T=`ab`, P=`a`), funcionam normalmente no JFLAP. **Não é erro
-> do modelo:** pelo teorema de equivalência, a MT de fita bi-infinita tem o
-> mesmo poder da de fita semi-infinita — é só uma diferença de representação. O
-> simulador em `mt_multifita.py` implementa o modelo padrão (bi-infinito) e está
-> correto, verificado em 7.905 casos. Para a demonstração, os casos com
-> retrocesso são executados pelo Python.
+> retrocesso (ex.: T = `aab`, P = `ab`). Os casos diretos, sem retrocesso (ex.:
+> T = `ab`, P = `ab`; T = `ab`, P = `a`), funcionam normalmente no JFLAP.
+>
+> **Não é erro do modelo:** pelo teorema de equivalência, a MT de fita bi-infinita
+> tem o mesmo poder da de fita semi-infinita — é só uma diferença de representação.
+> O simulador em Python implementa o modelo padrão (bi-infinito) e está correto,
+> verificado em 7.905 casos. Para a demonstração, os casos com retrocesso são
+> executados pelo Python.
 
-## Definições formais (resumo)
-
-**PDA** `M = (Q, Σ, Γ, δ, q0, Z0, F)` — **9 estados**
-- `Q = {q_start, q0, q_lt, q_oh, q_ogt, q_c0, q_ch, q_cgt, q_accept}`, `F = {q_accept}`.
-- `Σ = { <, >, /, p, h, 1, 2 }`, `Γ = { Z, P, A, B }` (P=`<p>`, A=`<h1>`, B=`<h2>`), fundo `Z0 = Z`.
-- Ao abrir uma tag, empilha o símbolo correspondente; ao fechar, só desempilha
-  se o topo for a tag certa — é assim que o aninhamento é verificado. Aceitação
-  por estado final com a pilha de volta ao fundo `Z`. É uma linguagem Livre de
-  Contexto: um autômato finito não controlaria a profundidade do aninhamento.
-
-**MT Multifita** `M = (Q, Σ, Γ, δ, q0, B, F)` — **k = 2 fitas, 9 estados**
-- Fita 1: texto T; Fita 2: padrão P.
-- A máquina lê cada símbolo do padrão para o controle finito (`q_have_a`/`q_have_b`)
-  e compara com o texto. Ao falhar, rebobina as duas cabeças em sincronia
-  (`q_reset` → `q_shift1` → `q_shift2`) e avança a âncora do texto em uma posição.
-- Equivalente em poder à MT de fita única; as duas fitas tornam a comparação natural.
+---
 
 ## Testes e rastreamento
 
-Ver `testes/`. Resumo da verificação automática:
+Ver `testes/`. Rastreamentos passo a passo disponíveis em:
+- `testes/rastreamento_pda.txt`
+- `testes/rastreamento_mt_multifita.txt`
+- `testes/relatorio.md` (tabelas-resumo)
 
-- **PDA:** correto em **55.987/55.987** cadeias (todas as combinações de 0 a 6
-  tags do vocabulário `<p> </p> <h1> </h1> <h2> </h2>`).
-- **MT busca de padrão:** correto em **7.905/7.905** casos (texto de 0–7 e padrão
-  de 0–4 símbolos sobre {a, b}), conferido contra o operador `in` do Python.
+### Verificação automática (exaustiva)
+
+| Modelo | Casos testados | Resultado |
+|---|---|---|
+| PDA | 55.987 cadeias (0 a 6 tags) | ✅ 55.987/55.987 corretos |
+| MT Multifita | 7.905 casos (texto 0–7, padrão 0–4, {a, b}) | ✅ 7.905/7.905 corretos |
 
 Cada modelo tem no mínimo 3 casos com entradas aceitas e casos rejeitados ou de fronteira.
 
+---
+
+## Estrutura do repositório
+
+```
+implementacoes/
+  automato_pilha/
+    automato_pilha.py      # PDA: definição formal + simulador
+    automato_pilha.jff     # PDA no formato JFLAP (9 estados)
+  mt_multifita/
+    mt_multifita.py         # MT (2 fitas): definição formal + simulador
+    mt_multifita.jff        # MT no formato JFLAP (2 fitas, 9 estados)
+testes/
+  rastreamento_pda.txt     # passos de execução do PDA
+  rastreamento_mt_multifita.txt # passos de execução da MT
+  relatorio.md             # tabelas-resumo + verificação automática
+slides/
+  MT e PDA.pptx            # slides da apresentação (15 slides)
+uso_ia.md                  # declaração de uso de IA
+README.md
+```
+
 ## Uso de IA
 
-Ver `uso_ia.md`.
+Ver [`uso_ia.md`](uso_ia.md).
 
 ## Referências
 
